@@ -4,7 +4,7 @@ pipeline {
     stages {
         stage('Verify SonarScanner Java Version') {
             steps {
-                sh '/opt/sonar-scanner/bin/sonar-scanner -version'
+                sh '/opt/sonar-scanner/bin/sonar-scanner --version'
             }
         }
         stage('Clone Repository') {
