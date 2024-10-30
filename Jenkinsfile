@@ -2,21 +2,21 @@ pipeline {
     agent any
 
     environment {
-        SONAR_SCANNER_HOME = '/opt/sonar-scanner'
+        JAVA_HOME = '/usr/lib/jvm/java-17-openjdk-amd64'
+        PATH = "${JAVA_HOME}/bin:/opt/sonar-scanner/bin:${env.PATH}"
     }
 
     stages {
         stage('Verify Java Version') {
             steps {
-                sh 'java -version' // Verify Java 17 is active
+                sh 'java -version'
+                sh 'which sonar-scanner'
             }
         }
-
         stage('Scan') {
             steps {
                 withSonarQubeEnv('sq2') {
-                    // Run sonar-scanner with debug logging enabled
-                    sh '${SONAR_SCANNER_HOME}/bin/sonar-scanner-java17 \
+                    sh 'sonar-scanner \
                         -Dsonar.projectKey=DVWA \
                         -Dsonar.sources=. \
                         -X'
