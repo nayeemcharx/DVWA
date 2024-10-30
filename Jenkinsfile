@@ -1,25 +1,28 @@
 pipeline {
     agent any
 
-    environment {
-        JAVA_HOME = '/usr/lib/jvm/java-17-openjdk-amd64'
-        PATH = "${JAVA_HOME}/bin:/opt/sonar-scanner/bin:${env.PATH}"
-    }
-
     stages {
-        stage('Verify Java Version') {
+        stage('Clone Repository') {
             steps {
-                sh 'java -version'
-                sh 'which sonar-scanner'
+                git 'https://github.com/nayeemcharx/DVWA.git'
             }
         }
-        stage('Scan') {
+
+        stage('SonarQube Analysis') {
             steps {
                 withSonarQubeEnv('sq2') {
-                    sh 'sonar-scanner \
-                        -Dsonar.projectKey=DVWA \
-                        -Dsonar.sources=. \
-                        -X'
+                    // Run SonarScanner in a Docker container with Java 17
+                    sh '''
+                        docker run --rm \
+                            -v "$PWD:/usr/src" \
+                            -e SONAR_HOST_URL="$SONAR_HOST_URL" \
+                            -e SONAR_LOGIN="$SONAR_AUTH_TOKEN" \
+                            sonarsource/sonar-scanner-cli:4.8-java17 \
+                            -Dsonar.projectKey=DVWA \
+                            -Dsonar.sources=/usr/src \
+                            -Dsonar.projectBaseDir=/usr/src \
+                            -X
+                    '''
                 }
             }
         }
