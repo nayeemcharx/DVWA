@@ -39,17 +39,17 @@ pipeline {
             steps {
                 withCredentials([string(credentialsId: 'defectdojo-api-token', variable: 'DEFECTDOJO_API_TOKEN')]) {
                     script {
-                        def defectdojoServer = 'http://103.217.110.2' 
+                        def defectdojoServer = 'http://103.217.110.2'
                         def engagementId = '10'
 
-                        // Securely pass the DefectDojo API token to the curl command
-                        sh '''
-                            curl -X POST -H "Authorization: Token ''' + DEFECTDOJO_API_TOKEN + '''" \
-                            -F "file=@sonarqube_issues.json" \
-                            -F "scan_type=SonarQube API Import" \
-                            -F "engagement=''' + engagementId + '''" \
-                            ''' + defectdojoServer + '''/api/v2/import-scan/'
-                        '''
+                        // Import SonarQube issues into DefectDojo via API
+                        sh """
+                            curl -X POST -H "Authorization: Token $DEFECTDOJO_API_TOKEN" \
+                            -F 'file=@sonarqube_issues.json' \
+                            -F 'scan_type=SonarQube API Import' \
+                            -F 'engagement=${engagementId}' \
+                            '${defectdojoServer}/api/v2/import-scan/'
+                        """
                     }
                 }
             }
